@@ -1,6 +1,6 @@
 // Fungsi buka profile guru
 function bukaProfileGuru() {
-    window.location.href = 'profile-guru.html';
+    window.location.href = 'profile.html';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
