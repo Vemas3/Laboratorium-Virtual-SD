@@ -23,7 +23,7 @@
                 <p>Jenis-Jenis Gaya dalam Kehidupan Sehari-hari</p>
             </div>
             <div class="user-info">
-                <div class="user-photo">👨‍🏫</div>
+                <div class="user-photo" onclick="bukaProfileGuru()">👨‍🏫</div>
                 <span>Guru Sains</span>
             </div>
         </div>
@@ -269,5 +269,19 @@
 
     <script src="script-materi.js"></script>
     <script src="refresh.js"></script>
+
+    <script>
+        function bukaProfileGuru() {
+            window.location.href = 'profile.html';
+        }
+        
+        // Tambah cursor pointer
+        document.addEventListener('DOMContentLoaded', function() {
+            const userPhotos = document.querySelectorAll('.user-photo');
+            userPhotos.forEach(photo => {
+                photo.style.cursor = 'pointer';
+            });
+        });
+    </script>
 </body>
 </html> 
