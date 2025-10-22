@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">⬅️ Kembali</a>
+            <div class="title">
+                <h1>🔬 SIMULASI INTERAKTIF</h1>
+                <p>Eksperimen Jenis-Jenis Gaya</p>
+            </div>
+            <div class="user-info">
+                <div class="user-photo">👨‍🏫</div>
+                <span>Guru Sains</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="lab-bench">
+            <div class="equipment-grid">
+                <div class="equipment-card" onclick="bukaAlat('otot')">
+                    <div class="equipment-icon">💪</div>
+                    <div class="equipment-name">Gaya Otot</div>
+                    <div class="equipment-desc">Eksperimen mendorong & mengangkat</div>
+                </div>
+
+                <div class="equipment-card" onclick="bukaAlat('gesek')">
+                    <div class="equipment-icon">🔄</div>
+                    <div class="equipment-name">Gaya Gesek</div>
+                    <div class="equipment-desc">Uji permukaan berbeda</div>
+                </div>
+
+                <div class="equipment-card" onclick="bukaAlat('magnet')">
+                    <div class="equipment-icon">🧲</div>
+                    <div class="equipment-name">Gaya Magnet</div>
+                    <div class="equipment-desc">Eksperimen tarik-menarik</div>
+                </div>
+
+                <div class="equipment-card" onclick="bukaAlat('pegas')">
+                    <div class="equipment-icon">💨</div>
+                    <div class="equipment-name">Gaya Pegas</div>
+                    <div class="equipment-desc">Uji elastisitas benda</div>
+                </div>
+
+                <div class="equipment-card" onclick="bukaAlat('gravitasi')">
+                    <div class="equipment-icon">🌍</div>
+                    <div class="equipment-name">Gaya Gravitasi</div>
+                    <div class="equipment-desc">Eksperimen benda jatuh</div>
+                </div>
+            </div>
+
+            <div class="work-area" id="work-area">
+                <div class="default-screen">
+                    <div class="welcome-message">
+                        <h2>🎯 Pilih Eksperimen Gaya</h2>
+                        <p>Klik pada jenis gaya untuk memulai eksperimen virtual</p>
+                        <div class="hint">
+                            <p>💡 Setiap jenis gaya memiliki eksperimen unik!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-screen" id="otot-screen">
+                    <div class="simulation-header">
+                        <h3>💪 Eksperimen Gaya Otot</h3>
+                        <button class="close-btn" onclick="tutupAlat()">✖️ Tutup</button>
+                    </div>
+                    <div class="otot-experiment">
+                        <div class="experiment-setup">
+                            <div class="object-box">
+                                <div class="object" id="movable-object">📦</div>
+                            </div>
+                            <div class="force-indicator">
+                                <div class="force-value">Gaya yang diberikan: <span id="force-value">0</span> N</div>
+                            </div>
+                        </div>
+                        <div class="otot-controls">
+                            <button onclick="dorongObject()">👆 Dorong ke Kanan</button>
+                            <button onclick="tarikObject()">👆 Tarik ke Kiri</button>
+                            <button onclick="angkatObject()">⬆️ Angkat Benda</button>
+                            <button onclick="resetOtot()">🔄 Reset</button>
+                        </div>
+                        <div class="experiment-info">
+                            Gunakan gaya otot untuk menggerakkan benda. Perhatikan besar gaya yang dibutuhkan!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-screen" id="gesek-screen">
+                    <div class="simulation-header">
+                        <h3>🔄 Eksperimen Gaya Gesek</h3>
+                        <button class="close-btn" onclick="tutupAlat()">✖️ Tutup</button>
+                    </div>
+                    <div class="gesek-experiment">
+                        <div class="surface-selection">
+                            <h4>Pilih Permukaan:</h4>
+                            <div class="surface-buttons">
+                                <button class="surface-btn active" onclick="gantiPermukaan('kayu')">🪵 Kayu</button>
+                                <button class="surface-btn" onclick="gantiPermukaan('es')">🧊 Es</button>
+                                <button class="surface-btn" onclick="gantiPermukaan('karpet')">🧶 Karpet</button>
+                            </div>
+                        </div>
+                        <div class="experiment-setup">
+                            <div class="surface" id="current-surface">
+                                <div class="sliding-object" id="sliding-object">📦</div>
+                            </div>
+                            <div class="friction-info">
+                                <div id="friction-level">Tingkat Gesekan: Sedang</div>
+                                <div id="distance-traveled">Jarak: 0 cm</div>
+                            </div>
+                        </div>
+                        <div class="gesek-controls">
+                            <button onclick="dorongDenganGaya(50)">💪 Dorong Pelan</button>
+                            <button onclick="dorongDenganGaya(100)">💪💪 Dorong Kuat</button>
+                            <button onclick="resetGesek()">🔄 Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-screen" id="magnet-screen">
+                    <div class="simulation-header">
+                        <h3>🧲 Eksperimen Gaya Magnet</h3>
+                        <button class="close-btn" onclick="tutupAlat()">✖️ Tutup</button>
+                    </div>
+                    <div class="magnet-experiment">
+                        <div class="magnet-setup">
+                            <div class="magnet" id="magnet" onclick="gerakkanMagnet()">🧲</div>
+                            <div class="objects">
+                                <div class="object iron" data-type="ferro">📌 Paku</div>
+                                <div class="object plastic" data-type="non-ferro">🥤 Plastik</div>
+                                <div class="object aluminum" data-type="non-ferro">🥫 Kaleng</div>
+                            </div>
+                        </div>
+                        <div class="magnet-info" id="magnet-info">
+                            Klik magnet untuk menggerakkan dan melihat benda yang tertarik
+                        </div>
+                        <div class="magnet-controls">
+                            <button onclick="resetMagnet()">🔄 Reset Posisi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-screen" id="pegas-screen">
+                    <div class="simulation-header">
+                        <h3>💨 Eksperimen Gaya Pegas</h3>
+                        <button class="close-btn" onclick="tutupAlat()">✖️ Tutup</button>
+                    </div>
+                    <div class="pegas-experiment">
+                        <div class="spring-setup">
+                            <div class="spring" id="spring">🔄</div>
+                            <div class="weight" id="weight">⚖️</div>
+                        </div>
+                        <div class="pegas-info">
+                            <div id="spring-status">Pegas: Normal</div>
+                            <div id="stretch-length">Regangan: 0 cm</div>
+                        </div>
+                        <div class="pegas-controls">
+                            <button onclick="tarikPegas()">⬇️ Tarik Pegas</button>
+                            <button onclick="lepasPegas()">🎯 Lepas Pegas</button>
+                            <button onclick="resetPegas()">🔄 Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-screen" id="gravitasi-screen">
+                    <div class="simulation-header">
+                        <h3>🌍 Eksperimen Gaya Gravitasi</h3>
+                        <button class="close-btn" onclick="tutupAlat()">✖️ Tutup</button>
+                    </div>
+                    <div class="gravitasi-experiment">
+                        <div class="drop-zone">
+                            <div class="drop-object" id="drop-object">🍎</div>
+                        </div>
+                        <div class="gravitasi-info">
+                            <div id="fall-speed">Kecepatan Jatuh: 0 m/s</div>
+                            <div id="fall-time">Waktu Jatuh: 0 detik</div>
+                        </div>
+                        <div class="gravitasi-controls">
+                            <button onclick="jatuhkanBenda()">⬇️ Jatuhkan Benda</button>
+                            <button onclick="resetGravitasi()">🔄 Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script-simulasi.js"></script>
+</body>
+</html>
