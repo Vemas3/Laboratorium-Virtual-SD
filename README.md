@@ -27,7 +27,7 @@ Aplikasi web interaktif untuk mempelajari jenis-jenis gaya dalam pelajaran sains
 ## 🚀 Cara Menjalankan
 
 ### Online (Recommended)
-Akses langsung via: **https://[Vemas3].github.io/virtual-lab-sains**
+Akses langsung via: https://vemas3.github.io/Laboratorium-Virtual-SD/
 
 ### Local Development
 ```bash
@@ -35,4 +35,5 @@ Akses langsung via: **https://[Vemas3].github.io/virtual-lab-sains**
 git clone https://github.com/[Vemas3]/virtual-lab-sains.git
 
 # Buka file index.html di browser
+
 # atau gunakan live server
