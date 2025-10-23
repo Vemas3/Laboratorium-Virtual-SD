@@ -179,39 +179,44 @@ body {
     border-bottom: 2px solid #dfe6e9;
 }
 
+/* PERBAIKAN: Detail Grid yang Lebih Rapi */
 .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 15px;
 }
 
 .detail-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 15px;
     background: #f8f9fa;
     border-radius: 10px;
     border-left: 4px solid #74b9ff;
+    min-height: 60px;
 }
 
 .label {
     font-weight: bold;
     color: #636e72;
+    min-width: 150px;
+    flex-shrink: 0;
 }
 
 .value {
     color: #2d3436;
     font-weight: 500;
+    flex: 1;
 }
 
-.education-list, .achievement-list {
+/* Education List */
+.education-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-.education-item, .achievement-item {
+.education-item {
     display: flex;
     align-items: center;
     gap: 20px;
@@ -221,71 +226,62 @@ body {
     transition: transform 0.3s ease;
 }
 
-.education-item:hover, .achievement-item:hover {
+.education-item:hover {
     transform: translateX(10px);
 }
 
-.edu-icon, .achievement-icon {
+.edu-icon {
     font-size: 2em;
     flex-shrink: 0;
 }
 
-.edu-info h3, .achievement-info h3 {
+.edu-info h3 {
     color: #2d3436;
     margin-bottom: 5px;
 }
 
-.edu-info p, .achievement-info p {
+.edu-info p {
     color: #636e72;
+    margin-bottom: 5px;
 }
 
-.skills-grid {
+.edu-info small {
+    color: #74b9ff;
+    font-weight: 500;
+}
+
+/* Contact Grid */
+.contact-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 15px;
 }
 
-.skill-item {
+.contact-item {
     display: flex;
     align-items: center;
     gap: 15px;
     padding: 15px;
     background: #f8f9fa;
     border-radius: 10px;
-    transition: all 0.3s ease;
+    border-left: 4px solid #74b9ff;
+    min-height: 70px;
 }
 
-.skill-item:hover {
-    background: #74b9ff;
-    color: white;
-    transform: translateY(-5px);
-}
-
-.skill-icon {
+.contact-icon {
     font-size: 1.5em;
+    flex-shrink: 0;
 }
 
-.skill-name {
-    font-weight: 500;
-}
-
-.message-card {
-    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
-    padding: 25px;
-    border-radius: 15px;
-    border-left: 5px solid #e17055;
-}
-
-.message-card p {
-    font-size: 1.1em;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    font-style: italic;
-}
-
-.signature {
-    text-align: right;
+.contact-info strong {
+    display: block;
     color: #2d3436;
+    margin-bottom: 5px;
+}
+
+.contact-info p {
+    color: #636e72;
+    margin: 0;
 }
 
 .profile-footer {
@@ -321,17 +317,43 @@ body {
         justify-content: center;
     }
     
+    /* Responsive untuk detail grid */
     .detail-grid {
         grid-template-columns: 1fr;
     }
     
-    .skills-grid {
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .label {
+        min-width: auto;
+        font-size: 0.9em;
+    }
+    
+    .contact-grid {
         grid-template-columns: 1fr;
     }
     
-    .education-item, .achievement-item {
+    .education-item {
         flex-direction: column;
         text-align: center;
         gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-details {
+        padding: 20px;
+    }
+    
+    .detail-section h2 {
+        font-size: 1.3em;
     }
 }
