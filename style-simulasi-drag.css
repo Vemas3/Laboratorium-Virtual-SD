@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-image: url('backgroundindex.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Background animasi dinonaktifkan */
+.background {
+    display: none;
+}
+
+.lab-elements {
+    display: none;
+}
+
+.simulasi-header {
+    background: rgba(255, 255, 255, 0.8); /* dari 0.95 jadi 0.8 (lebih transparan) */
+    padding: 15px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.simulasi-header .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.back-btn {
+    background: #74b9ff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 1em;
+}
+
+.back-btn:hover {
+    background: #0984e3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+}
+
+.title h1 {
+    color: #2d3436;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.title p {
+    color: #636e72;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.lab-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.lab-bench {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
+    min-height: 600px;
+}
+
+.simulation-area {
+    background: rgba(255, 255, 255, 0.8); /* dari 0.95 jadi 0.8 (lebih transparan) */
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.control-panel {
+    background: rgba(255, 255, 255, 0.8); /* dari 0.95 jadi 0.8 (lebih transparan) */
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.simulation-canvas-container {
+    background: rgba(248, 249, 250, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 3px solid #dfe6e9;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#simulationCanvas {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: bold;
+    color: #2d3436;
+    font-size: 0.95em;
+}
+
+.control-group input {
+    padding: 12px;
+    border: 2px solid #b2bec3;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+}
+
+.control-group input:focus {
+    outline: none;
+    border-color: #74b9ff;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    background: #74b9ff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0984e3;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #636e72;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #2d3436;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #00b894;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #00a085;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: #d63031;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c23616;
+    transform: translateY(-2px);
+}
+
+.data-display {
+    background: rgba(248, 249, 250, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.data-display h3 {
+    color: #2d3436;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.data-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #dfe6e9;
+}
+
+.data-label {
+    font-weight: 600;
+    color: #636e72;
+}
+
+.data-value {
+    font-weight: bold;
+    color: #0984e3;
+    font-family: 'Courier New', monospace;
+}
+
+.unit {
+    color: #636e72;
+    font-size: 0.9em;
+    margin-left: 5px;
+}
+
+.instruction-card {
+    background: rgba(255, 255, 255, 0.75); /* dari 0.9 jadi 0.75 (lebih transparan) */
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    border-left: 4px solid #74b9ff;
+    backdrop-filter: blur(5px);
+}
+
+.instruction-card h3 {
+    color: #2d3436;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.instruction-card ol {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.instruction-card li {
+    margin-bottom: 12px;
+    line-height: 1.5;
+    color: #2d3436;
+}
+
+.instruction-card strong {
+    color: #0984e3;
+}
+
+@media (max-width: 1024px) {
+    .lab-bench {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .control-panel {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .simulasi-header .header-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .lab-container {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .simulation-canvas-container {
+        padding: 15px;
+        min-height: 300px;
+    }
+    
+    .control-panel, .simulation-area {
+        padding: 20px;
+    }
+    
+    .title h1 {
+        font-size: 1.6em;
+    }
+}

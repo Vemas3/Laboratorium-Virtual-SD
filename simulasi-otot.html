@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya Otot - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi-drag.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="simulasi.html" class="back-btn">⬅️ Kembali ke Pilihan</a>
+            <div class="title">
+                <h1>💪 SIMULASI GAYA OTOT</h1>
+                <p>Eksperimen Drag & Drop - Pindahkan Benda dengan Gaya Otot</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="experiment-area">
+            <div class="control-panel">
+                <h3>🎮 Kontrol Eksperimen</h3>
+                <div class="control-group">
+                    <label>Pilih Benda:</label>
+                    <select id="object-select" onchange="ubahBenda()">
+                        <option value="kotak">📦 Kotak Kayu (5kg)</option>
+                        <option value="bola">🏀 Bola Basket (2kg)</option>
+                        <option value="drum">🛢️ Drum Besi (20kg)</option>
+                        <option value="buku">📚 Buku (1kg)</option>
+                    </select>
+                </div>
+                <div class="data-display">
+                    <div class="data-item">Gaya Dibutuhkan: <span id="required-force">25</span> N</div>
+                    <div class="data-item">Usaha: <span id="work">0</span> Joule</div>
+                    <div class="data-item">Jarak: <span id="distance">0</span> m</div>
+                </div>
+            </div>
+
+            <div class="drag-experiment-area">
+                <div class="start-zone" id="start-zone">
+                    <h4>🏁 Zona Start</h4>
+                    <div class="instruction">Tarik benda dari sini!</div>
+                    <div class="draggable-object" id="draggable-object" draggable="true">
+                        <div class="object-icon">📦</div>
+                        <div class="object-info">
+                            <div class="object-name">Kotak Kayu</div>
+                            <div class="object-mass">5 kg</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drag-path">
+                    <div class="path-line"></div>
+                    <div class="distance-marker">➡️ 5 meter ➡️</div>
+                    <div class="path-line"></div>
+                </div>
+
+                <div class="target-zone" id="target-zone">
+                    <h4>🎯 Zona Target</h4>
+                    <div class="instruction">Tarik benda ke sini!</div>
+                    <div class="drop-indicator" id="drop-indicator">
+                        ⌛ Lepaskan di sini
+                    </div>
+                </div>
+            </div>
+
+            <div class="experiment-controls">
+                <button onclick="resetExperiment()">🔄 Reset Eksperimen</button>
+                <button onclick="hitungEnergi()">📊 Hitung Energi</button>
+                <button onclick="tampilkanPenjelasan()">💡 Penjelasan</button>
+            </div>
+
+            <div class="experiment-info">
+                <h4>💡 Petunjuk Eksperimen</h4>
+                <p><strong>Drag & drop</strong> benda dari Zona Start ke Zona Target. Perhatikan bagaimana <strong>massa benda</strong> mempengaruhi gaya yang dibutuhkan dan usaha yang dilakukan!</p>
+                <div class="physics-info">
+                    <strong>Rumus Fisika:</strong> Usaha = Gaya × Jarak (W = F × s)
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentObject = 'kotak';
+        let usahaTerkumpul = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhysics();
+        });
+
+        function initDragDrop() {
+            const draggable = document.getElementById('draggable-object');
+            const targetZone = document.getElementById('target-zone');
+            const dropIndicator = document.getElementById('drop-indicator');
+            
+            draggable.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                this.classList.add('dragging');
+                dropIndicator.textContent = '🎯 Lepaskan sekarang!';
+                dropIndicator.style.background = '#ffeaa7';
+            });
+
+            draggable.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                targetZone.classList.remove('drag-over');
+                dropIndicator.textContent = '⌛ Lepaskan di sini';
+                dropIndicator.style.background = '';
+            });
+            
+            targetZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            targetZone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            targetZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                const draggable = document.getElementById(id);
+                
+                if (draggable) {
+                    this.appendChild(draggable);
+                    draggable.classList.remove('dragging');
+                    this.classList.remove('drag-over');
+                    
+                    hitungUsaha();
+                    
+                    showMessage('🎉 Berhasil! Benda berhasil dipindahkan!', 'success');
+                    dropIndicator.textContent = '✅ Berhasil!';
+                    dropIndicator.style.background = '#55efc4';
+                    
+                    usahaTerkumpul += parseInt(document.getElementById('work').textContent);
+                }
+            });
+        }
+
+        function ubahBenda() {
+            const select = document.getElementById('object-select');
+            currentObject = select.value;
+            const object = document.getElementById('draggable-object');
+            const objectIcon = object.querySelector('.object-icon');
+            const objectName = object.querySelector('.object-name');
+            const objectMass = object.querySelector('.object-mass');
+            
+            const objects = {
+                'kotak': { icon: '📦', name: 'Kotak Kayu', mass: '5 kg' },
+                'bola': { icon: '🏀', name: 'Bola Basket', mass: '2 kg' },
+                'drum': { icon: '🛢️', name: 'Drum Besi', mass: '20 kg' },
+                'buku': { icon: '📚', name: 'Buku', mass: '1 kg' }
+            };
+            
+            const selectedObject = objects[currentObject];
+            objectIcon.textContent = selectedObject.icon;
+            objectName.textContent = selectedObject.name;
+            objectMass.textContent = selectedObject.mass;
+            
+            updatePhysics();
+            resetExperiment();
+        }
+
+        function updatePhysics() {
+            const massValues = { 
+                'kotak': 5, 
+                'bola': 2, 
+                'drum': 20, 
+                'buku': 1 
+            };
+            const mass = massValues[currentObject];
+            const requiredForce = mass * 5;
+            
+            document.getElementById('required-force').textContent = requiredForce;
+        }
+
+        function hitungUsaha() {
+            const force = parseInt(document.getElementById('required-force').textContent);
+            const distance = 5;
+            const work = force * distance;
+            
+            document.getElementById('work').textContent = work;
+            document.getElementById('distance').textContent = distance;
+        }
+
+        function hitungEnergi() {
+            const work = parseInt(document.getElementById('work').textContent);
+            if (work > 0) {
+                showMessage(`⚡ Energi yang digunakan: ${work} Joule\n📦 Total usaha terkumpul: ${usahaTerkumpul} Joule`, 'info');
+            } else {
+                showMessage('❌ Belum ada usaha yang dilakukan. Pindahkan benda terlebih dahulu!', 'error');
+            }
+        }
+
+        function resetExperiment() {
+            const startZone = document.getElementById('start-zone');
+            const draggable = document.getElementById('draggable-object');
+            const dropIndicator = document.getElementById('drop-indicator');
+            
+            startZone.appendChild(draggable);
+            document.getElementById('work').textContent = '0';
+            document.getElementById('distance').textContent = '0';
+            dropIndicator.textContent = '⌛ Lepaskan di sini';
+            dropIndicator.style.background = '';
+            
+            showMessage('🔄 Eksperimen direset! Silakan coba lagi.', 'info');
+        }
+
+        function tampilkanPenjelasan() {
+            const force = parseInt(document.getElementById('required-force').textContent);
+            const mass = currentObject === 'kotak' ? 5 : currentObject === 'bola' ? 2 : currentObject === 'drum' ? 20 : 1;
+            
+            const penjelasan = `
+📚 <strong>Penjelasan Gaya Otot:</strong>
+
+🤸 <strong>Gaya Otot</strong> adalah gaya yang dihasilkan oleh otot-otot tubuh kita.
+
+📊 <strong>Data Eksperimen:</strong>
+• Massa benda: ${mass} kg
+• Gaya yang dibutuhkan: ${force} Newton
+• Jarak tempuh: 5 meter
+
+🔬 <strong>Konsep Fisika:</strong>
+• <strong>Hukum Newton II:</strong> F = m × a
+• <strong>Usaha:</strong> W = F × s
+• Semakin berat benda, semakin besar gaya yang dibutuhkan
+
+💪 <strong>Contoh dalam kehidupan:</strong>
+• Mengangkat tas sekolah
+• Mendorong meja
+• Menarik kursi
+            `;
+            
+            showMessage(penjelasan, 'info');
+        }
+
+        function showMessage(message, type) {
+            const oldMessage = document.querySelector('.message');
+            if (oldMessage) oldMessage.remove();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message;
+            
+            document.querySelector('.experiment-area').prepend(messageDiv);
+            
+            const delay = type === 'info' ? 8000 : 5000;
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, delay);
+        }
+    </script>
+</body>
+</html>

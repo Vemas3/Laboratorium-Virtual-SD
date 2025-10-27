@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Guru - Virtual Lab Sains SD</title>
+    <title>Profil - Virtual Lab Sains SD</title>
     <meta name="app-version" content="1.0.0">
-    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="style-profile.css">
 </head>
 <body>
     <div class="background">
@@ -20,12 +20,14 @@
         <div class="header-content">
             <a href="index.html" class="back-btn">⬅️ Kembali</a>
             <div class="title">
-                <h1>👩‍🏫 PROFIL GURU</h1>
-                <p>Identitas Pengajar Virtual Lab Sains</p>
+                <h1>PROFIL</h1>
+                <p>Identitas Pengajar Laboratorium Virtual SD</p>
             </div>
             <div class="user-info">
-                <div class="user-photo">👩‍🏫</div>
-                <span>Guru Sains</span>
+                <div class="user-photo">
+                    <img src="fotofriss.jpg" alt="Foto Guru">
+                </div>
+                <span>Profil</span>
             </div>
         </div>
     </header>
@@ -33,7 +35,9 @@
     <main class="profile-container">
         <div class="profile-card">
             <div class="profile-header-card">
-                <div class="profile-avatar">👩‍🏫</div>
+                <div class="profile-avatar">
+                    <img src="fotofriss.jpg" alt="Frissenda Septrianur">
+                </div>
                 <div class="profile-info">
                     <h1>Frissenda Septrianur Marinda Karno Putri</h1>
                     <p class="subject">Mahasiswa Pendidikan Guru Sekolah Dasar</p>
@@ -127,10 +131,13 @@
     </main>
 
     <footer class="profile-footer">
-        <p>© 2024 Virtual Lab Sains SD | Frissenda Septrianur Marinda Karno Putri - 220611100069</p>
+        <p>© 2025 Virtual Lab Sains SD | Frissenda Septrianur Marinda Karno Putri - 220611100069</p>
     </footer>
 
-    <script src="refresh.js"></script>
+    <script>
+        function bukaProfileGuru() {
+            window.location.href = 'profile.html';
+        }
+    </script>
 </body>
-
 </html>

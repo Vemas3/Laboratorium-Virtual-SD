@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya Gesek - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi-drag.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="simulasi.html" class="back-btn">⬅️ Kembali ke Pilihan</a>
+            <div class="title">
+                <h1>🔄 SIMULASI GAYA GESEK</h1>
+                <p>Eksperimen Drag & Drop - Geser Benda di Berbagai Permukaan</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="experiment-area">
+            <div class="control-panel">
+                <h3>🎮 Kontrol Eksperimen</h3>
+                <div class="surface-selection">
+                    <h4>Pilih Permukaan:</h4>
+                    <div class="surface-buttons">
+                        <button class="surface-btn active" onclick="gantiPermukaan('kayu')">🪵 Kayu</button>
+                        <button class="surface-btn" onclick="gantiPermukaan('es')">🧊 Es</button>
+                        <button class="surface-btn" onclick="gantiPermukaan('karpet')">🧶 Karpet</button>
+                        <button class="surface-btn" onclick="gantiPermukaan('karet')">⚫ Karet</button>
+                    </div>
+                </div>
+                <div class="data-display">
+                    <div class="data-item">Gaya Gesek: <span id="friction-force">20</span> N</div>
+                    <div class="data-item">Koefisien Gesek: <span id="friction-coef">0.4</span></div>
+                    <div class="data-item">Status: <span id="friction-status">Diam</span></div>
+                </div>
+            </div>
+
+            <div class="drag-experiment-area">
+                <div class="surface-area" id="surface-area">
+                    <div class="surface-label" id="surface-label">Permukaan Kayu</div>
+                    <div class="draggable-object" id="draggable-object" draggable="true">
+                        <div class="object-icon">📦</div>
+                        <div class="object-info">
+                            <div class="object-name">Kotak Kayu</div>
+                            <div class="object-mass">5 kg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="experiment-controls">
+                <button onclick="resetExperiment()">🔄 Reset Eksperimen</button>
+                <button onclick="tampilkanPenjelasan()">💡 Penjelasan</button>
+            </div>
+
+            <div class="experiment-info">
+                <h4>💡 Petunjuk Eksperimen</h4>
+                <p><strong>Drag & drop</strong> benda di atas permukaan berbeda. Amati bagaimana <strong>gaya gesek</strong> mempengaruhi kemudahan menarik benda!</p>
+                <div class="physics-info">
+                    <strong>Rumus Fisika:</strong> Gaya Gesek = Koefisien Gesek × Gaya Normal
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentSurface = 'kayu';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhysics();
+        });
+
+        function initDragDrop() {
+            const draggable = document.getElementById('draggable-object');
+            const surfaceArea = document.getElementById('surface-area');
+            
+            draggable.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                this.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                surfaceArea.classList.remove('drag-over');
+                document.getElementById('friction-status').textContent = 'Bergerak';
+                showMessage('🔧 Gaya gesek bekerja menghambat gerakan!', 'info');
+            });
+            
+            surfaceArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            surfaceArea.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            surfaceArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                const draggable = document.getElementById(id);
+                
+                if (draggable) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left - draggable.offsetWidth / 2;
+                    const y = e.clientY - rect.top - draggable.offsetHeight / 2;
+                    
+                    draggable.style.position = 'absolute';
+                    draggable.style.left = x + 'px';
+                    draggable.style.top = y + 'px';
+                    
+                    draggable.classList.remove('dragging');
+                    this.classList.remove('drag-over');
+                }
+            });
+        }
+
+        function gantiPermukaan(permukaan) {
+            currentSurface = permukaan;
+            document.getElementById('surface-label').textContent = 'Permukaan ' + 
+                (permukaan === 'kayu' ? 'Kayu' : 
+                 permukaan === 'es' ? 'Es' : 
+                 permukaan === 'karpet' ? 'Karpet' : 'Karet');
+            
+            document.querySelectorAll('.surface-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            updatePhysics();
+        }
+
+        function updatePhysics() {
+            const frictionValues = {
+                'kayu': { force: 20, coef: 0.4 },
+                'es': { force: 5, coef: 0.1 },
+                'karpet': { force: 40, coef: 0.8 },
+                'karet': { force: 60, coef: 1.2 }
+            };
+            
+            const friction = frictionValues[currentSurface];
+            document.getElementById('friction-force').textContent = friction.force;
+            document.getElementById('friction-coef').textContent = friction.coef;
+        }
+
+        function resetExperiment() {
+            const draggable = document.getElementById('draggable-object');
+            draggable.style.position = 'static';
+            draggable.style.left = '';
+            draggable.style.top = '';
+            document.getElementById('friction-status').textContent = 'Diam';
+            
+            showMessage('🔄 Eksperimen direset! Coba permukaan berbeda.', 'info');
+        }
+
+        function tampilkanPenjelasan() {
+            const friction = parseInt(document.getElementById('friction-force').textContent);
+            const coef = parseFloat(document.getElementById('friction-coef').textContent);
+            
+            const penjelasan = `
+📚 <strong>Penjelasan Gaya Gesek:</strong>
+
+🔄 <strong>Gaya Gesek</strong> adalah gaya yang menghambat gerakan benda di atas permukaan.
+
+📊 <strong>Data Eksperimen:</strong>
+• Gaya gesek: ${friction} Newton
+• Koefisien gesek: ${coef}
+• Permukaan: ${currentSurface}
+
+🔬 <strong>Konsep Fisika:</strong>
+• <strong>Gaya Gesek Statis:</strong> Saat benda diam
+• <strong>Gaya Gesek Kinetis:</strong> Saat benda bergerak
+• Semakin kasar permukaan, semakin besar gaya gesek
+
+🏠 <strong>Contoh dalam kehidupan:</strong>
+• Berjalan tanpa terpeleset
+• Rem sepeda dan mobil
+• Menulis dengan pensil
+            `;
+            
+            showMessage(penjelasan, 'info');
+        }
+
+        function showMessage(message, type) {
+            const oldMessage = document.querySelector('.message');
+            if (oldMessage) oldMessage.remove();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message;
+            
+            document.querySelector('.experiment-area').prepend(messageDiv);
+            
+            const delay = type === 'info' ? 8000 : 5000;
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, delay);
+        }
+    </script>
+</body>
+</html>

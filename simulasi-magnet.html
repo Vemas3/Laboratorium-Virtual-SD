@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya Magnet - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi-drag.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="simulasi.html" class="back-btn">⬅️ Kembali ke Pilihan</a>
+            <div class="title">
+                <h1>🧲 SIMULASI GAYA MAGNET</h1>
+                <p>Eksperimen Drag & Drop - Tarik Benda dengan Gaya Magnet</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="experiment-area">
+            <div class="control-panel">
+                <h3>🎮 Kontrol Eksperimen</h3>
+                <div class="control-group">
+                    <label>Kekuatan Magnet: <span id="magnet-power">50</span>%</label>
+                    <input type="range" id="magnet-slider" min="10" max="100" value="50" onchange="ubahKekuatanMagnet()">
+                </div>
+                <div class="pole-selection">
+                    <label>Kutub Magnet:</label>
+                    <div class="pole-buttons">
+                        <button class="pole-btn active" onclick="ubahKutub('utara')">N (Utara)</button>
+                        <button class="pole-btn" onclick="ubahKutub('selatan')">S (Selatan)</button>
+                    </div>
+                </div>
+                <div class="data-display">
+                    <div class="data-item">Gaya Magnet: <span id="magnetic-force">25</span> N</div>
+                    <div class="data-item">Jarak: <span id="magnet-distance">50</span> cm</div>
+                    <div class="data-item">Benda Tertarik: <span id="attracted-object">-</span></div>
+                </div>
+            </div>
+
+            <div class="drag-experiment-area">
+                <div class="magnet-setup">
+                    <div class="magnet-area">
+                        <h4>🧲 Area Magnet</h4>
+                        <div class="draggable-magnet" id="draggable-magnet" draggable="true">
+                            <div class="magnet-icon">🧲</div>
+                            <div class="magnet-pole" id="magnet-pole">N</div>
+                            <div class="magnet-strength">Kekuatan: <span id="strength-display">50</span>%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="objects-area">
+                        <h4>📦 Benda Uji</h4>
+                        <div class="magnetic-objects">
+                            <div class="magnetic-object iron" data-type="ferro" id="obj-besi">
+                                <div class="object-icon">📌</div>
+                                <div class="object-info">
+                                    <div class="object-name">Paku Besi</div>
+                                    <div class="object-type">Besi</div>
+                                </div>
+                            </div>
+                            <div class="magnetic-object plastic" data-type="non-ferro" id="obj-plastik">
+                                <div class="object-icon">🥤</div>
+                                <div class="object-info">
+                                    <div class="object-name">Botol Plastik</div>
+                                    <div class="object-type">Non-Magnetis</div>
+                                </div>
+                            </div>
+                            <div class="magnetic-object aluminum" data-type="non-ferro" id="obj-kaleng">
+                                <div class="object-icon">🥫</div>
+                                <div class="object-info">
+                                    <div class="object-name">Kaleng</div>
+                                    <div class="object-type">Aluminium</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="experiment-controls">
+                <button onclick="resetExperiment()">🔄 Reset Posisi</button>
+                <button onclick="testAllObjects()">🧪 Test Semua Benda</button>
+                <button onclick="tampilkanPenjelasan()">💡 Penjelasan</button>
+            </div>
+
+            <div class="experiment-info">
+                <h4>💡 Petunjuk Eksperimen</h4>
+                <p><strong>Drag & drop</strong> magnet mendekati benda-benda. Amati benda mana yang <strong>tertarik oleh gaya magnet</strong> dan bagaimana kekuatan magnet mempengaruhi jarak tarik-menarik!</p>
+                <div class="physics-info">
+                    <strong>Fakta:</strong> Hanya benda feromagnetik (besi, nikel, kobalt) yang tertarik magnet
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let magnetPower = 50;
+        let magnetPole = 'utara';
+        let magnetPosition = { x: 0, y: 0 };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhysics();
+        });
+
+        function initDragDrop() {
+            const draggable = document.getElementById('draggable-magnet');
+            const magnetArea = document.querySelector('.magnet-area');
+            
+            draggable.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                this.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', function(e) {
+                this.classList.remove('dragging');
+                magnetArea.classList.remove('drag-over');
+                
+                // Update posisi magnet
+                const rect = magnetArea.getBoundingClientRect();
+                magnetPosition.x = e.clientX - rect.left;
+                magnetPosition.y = e.clientY - rect.top;
+                
+                // Cek interaksi dengan semua benda
+                cekInteraksiMagnet();
+            });
+            
+            magnetArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            magnetArea.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            magnetArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                const draggable = document.getElementById(id);
+                
+                if (draggable) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left - draggable.offsetWidth / 2;
+                    const y = e.clientY - rect.top - draggable.offsetHeight / 2;
+                    
+                    draggable.style.position = 'absolute';
+                    draggable.style.left = x + 'px';
+                    draggable.style.top = y + 'px';
+                    
+                    magnetPosition.x = x;
+                    magnetPosition.y = y;
+                    
+                    draggable.classList.remove('dragging');
+                    this.classList.remove('drag-over');
+                    
+                    cekInteraksiMagnet();
+                }
+            });
+        }
+
+        function ubahKekuatanMagnet() {
+            const slider = document.getElementById('magnet-slider');
+            magnetPower = parseInt(slider.value);
+            document.getElementById('magnet-power').textContent = magnetPower;
+            document.getElementById('strength-display').textContent = magnetPower;
+            
+            updatePhysics();
+            cekInteraksiMagnet();
+        }
+
+        function ubahKutub(kutub) {
+            magnetPole = kutub;
+            document.getElementById('magnet-pole').textContent = kutub === 'utara' ? 'N' : 'S';
+            
+            document.querySelectorAll('.pole-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            showMessage(`🧲 Kutub magnet diubah menjadi: ${kutub === 'utara' ? 'Utara (N)' : 'Selatan (S)'}`, 'info');
+        }
+
+        function cekInteraksiMagnet() {
+            const objects = document.querySelectorAll('.magnetic-object');
+            let attractedObjects = [];
+            let attractedCount = 0;
+            
+            objects.forEach(obj => {
+                const objRect = obj.getBoundingClientRect();
+                const magnetRect = document.getElementById('draggable-magnet').getBoundingClientRect();
+                
+                const distance = Math.sqrt(
+                    Math.pow(magnetRect.left - objRect.left, 2) + 
+                    Math.pow(magnetRect.top - objRect.top, 2)
+                );
+                
+                const maxDistance = (magnetPower / 10) * 50; // Jarak maksimum berdasarkan kekuatan magnet
+                
+                if (distance < maxDistance && obj.classList.contains('iron')) {
+                    obj.classList.add('attracted');
+                    attractedObjects.push(obj.querySelector('.object-name').textContent);
+                    attractedCount++;
+                    
+                    // Animasi tarik-menarik
+                    obj.style.transform = `translate(${magnetRect.left - objRect.left > 0 ? '-' : ''}10px, ${magnetRect.top - objRect.top > 0 ? '-' : ''}5px)`;
+                } else {
+                    obj.classList.remove('attracted');
+                    obj.style.transform = 'translate(0, 0)';
+                }
+            });
+            
+            // Update data display
+            document.getElementById('magnetic-force').textContent = Math.round(magnetPower * 0.5);
+            document.getElementById('magnet-distance').textContent = Math.round(100 - magnetPower);
+            
+            if (attractedCount > 0) {
+                document.getElementById('attracted-object').textContent = attractedObjects.join(', ');
+                showMessage(`🎯 Magnet menarik: ${attractedObjects.join(', ')}!`, 'success');
+            } else {
+                document.getElementById('attracted-object').textContent = '-';
+            }
+        }
+
+        function testAllObjects() {
+            const objects = [
+                { name: 'Paku Besi', type: 'ferro', attracted: true },
+                { name: 'Botol Plastik', type: 'non-ferro', attracted: false },
+                { name: 'Kaleng', type: 'non-ferro', attracted: false }
+            ];
+            
+            let result = "🧪 Hasil Test Magnet:\n\n";
+            objects.forEach(obj => {
+                result += `${obj.attracted ? '✅' : '❌'} ${obj.name} - ${obj.type} - ${obj.attracted ? 'Tertarik' : 'Tidak Tertarik'}\n`;
+            });
+            
+            result += `\n💡 Hanya benda besi yang tertarik magnet!`;
+            showMessage(result, 'info');
+        }
+
+        function resetExperiment() {
+            const draggable = document.getElementById('draggable-magnet');
+            const magnetArea = document.querySelector('.magnet-area');
+            
+            draggable.style.position = 'static';
+            draggable.style.left = '';
+            draggable.style.top = '';
+            
+            const objects = document.querySelectorAll('.magnetic-object');
+            objects.forEach(obj => {
+                obj.classList.remove('attracted');
+                obj.style.transform = 'translate(0, 0)';
+            });
+            
+            document.getElementById('attracted-object').textContent = '-';
+            
+            showMessage('🔄 Posisi magnet dan benda direset!', 'info');
+        }
+
+        function updatePhysics() {
+            // Physics calculation for magnetic force
+            const magneticForce = Math.round(magnetPower * 0.5);
+            document.getElementById('magnetic-force').textContent = magneticForce;
+        }
+
+        function tampilkanPenjelasan() {
+            const penjelasan = `
+📚 <strong>Penjelasan Gaya Magnet:</strong>
+
+🧲 <strong>Gaya Magnet</strong> adalah gaya yang dihasilkan oleh magnet untuk menarik atau menolak benda magnetis.
+
+📊 <strong>Data Eksperimen:</strong>
+• Kekuatan magnet: ${magnetPower}%
+• Gaya magnet: ${document.getElementById('magnetic-force').textContent} Newton
+• Kutub: ${magnetPole === 'utara' ? 'Utara (N)' : 'Selatan (S)'}
+
+🔬 <strong>Konsep Fisika:</strong>
+• <strong>Kutub Magnet:</strong> Utara (N) dan Selatan (S)
+• <strong>Benda Feromagnetik:</strong> Besi, nikel, kobalt
+• <strong>Benda Non-Magnetik:</strong> Plastik, aluminium, kayu
+• Kutub sama tolak-menolak, kutub berbeda tarik-menarik
+
+🏠 <strong>Contoh dalam kehidupan:</strong>
+• Pintu kulkas magnet
+• Kompas
+• Dinamo sepeda
+• Speaker
+            `;
+            
+            showMessage(penjelasan, 'info');
+        }
+
+        function showMessage(message, type) {
+            const oldMessage = document.querySelector('.message');
+            if (oldMessage) oldMessage.remove();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message;
+            
+            document.querySelector('.experiment-area').prepend(messageDiv);
+            
+            const delay = type === 'info' ? 8000 : 5000;
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, delay);
+        }
+    </script>
+
+    <style>
+        .magnet-setup {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .magnet-area, .objects-area {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed #b2bec3;
+            min-height: 250px;
+            position: relative;
+        }
+
+        .magnet-area h4, .objects-area h4 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+
+        .draggable-magnet {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: grab;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid #ff4757;
+        }
+
+        .magnet-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .magnet-pole {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .magnet-strength {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .magnetic-objects {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .magnetic-object {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .magnetic-object.iron {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            color: white;
+        }
+
+        .magnetic-object.plastic {
+            background: linear-gradient(135deg, #81ecec, #00cec9);
+            color: #2d3436;
+        }
+
+        .magnetic-object.aluminum {
+            background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+            color: #2d3436;
+        }
+
+        .magnetic-object.attracted {
+            transform: translateX(-20px);
+            box-shadow: 0 5px 15px rgba(255, 118, 117, 0.4);
+            border: 2px solid #ff7675;
+        }
+
+        .object-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .object-type {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .pole-selection {
+            margin: 20px 0;
+        }
+
+        .pole-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .pole-btn {
+            background: #dfe6e9;
+            color: #2d3436;
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .pole-btn.active, .pole-btn:hover {
+            background: #74b9ff;
+            color: white;
+            border-color: #0984e3;
+        }
+
+        @media (max-width: 768px) {
+            .magnet-setup {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>

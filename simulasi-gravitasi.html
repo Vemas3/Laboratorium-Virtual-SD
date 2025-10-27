@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya Gravitasi - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi-drag.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="simulasi.html" class="back-btn">⬅️ Kembali ke Pilihan</a>
+            <div class="title">
+                <h1>🌍 SIMULASI GAYA GRAVITASI</h1>
+                <p>Eksperimen Drag & Drop - Jatuhkan Benda dari Ketinggian</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="experiment-area">
+            <div class="control-panel">
+                <h3>🎮 Kontrol Eksperimen</h3>
+                <div class="control-group">
+                    <label>Massa Benda: <span id="gravity-mass">1</span> kg</label>
+                    <select id="mass-select" onchange="ubahMassaBenda()">
+                        <option value="1">1 kg (Bola)</option>
+                        <option value="2">2 kg (Batu)</option>
+                        <option value="5">5 kg (Kotak)</option>
+                        <option value="10">10 kg (Drum)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Planet: <span id="planet-name">Bumi</span></label>
+                    <select id="planet-select" onchange="ubahPlanet()">
+                        <option value="bumi">🌍 Bumi (9.8 m/s²)</option>
+                        <option value="bulan">🌕 Bulan (1.6 m/s²)</option>
+                        <option value="mars">🪐 Mars (3.7 m/s²)</option>
+                        <option value="jupiter">🪐 Jupiter (24.8 m/s²)</option>
+                    </select>
+                </div>
+                <div class="data-display">
+                    <div class="data-item">Ketinggian: <span id="current-height">50</span> m</div>
+                    <div class="data-item">Energi Potensial: <span id="potential-energy">490</span> J</div>
+                    <div class="data-item">Gravitasi: <span id="gravity-value">9.8</span> m/s²</div>
+                </div>
+            </div>
+
+            <div class="drag-experiment-area">
+                <div class="gravity-setup">
+                    <div class="height-indicator">
+                        <div class="height-mark">100m</div>
+                        <div class="height-mark">75m</div>
+                        <div class="height-mark">50m</div>
+                        <div class="height-mark">25m</div>
+                        <div class="height-mark">0m</div>
+                    </div>
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="draggable-object" id="draggable-object" draggable="true">
+                            <div class="object-icon" id="object-icon">🏀</div>
+                            <div class="object-info">
+                                <div class="object-mass">1 kg</div>
+                                <div class="object-name">Bola</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ground">
+                        <div class="ground-label">🏔️ Permukaan Tanah</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="experiment-controls">
+                <button onclick="jatuhkanBenda()">⬇️ Jatuhkan Benda</button>
+                <button onclick="resetExperiment()">🔄 Reset Posisi</button>
+                <button onclick="tampilkanPenjelasan()">💡 Penjelasan</button>
+            </div>
+
+            <div class="experiment-info">
+                <h4>💡 Petunjuk Eksperimen</h4>
+                <p><strong>Drag & drop</strong> benda ke ketinggian berbeda, lalu jatuhkan! Amati bagaimana <strong>massa benda</strong> dan <strong>gravitasi planet</strong> mempengaruhi energi potensial dan kecepatan jatuh!</p>
+                <div class="physics-info">
+                    <strong>Rumus:</strong> Energi Potensial = m × g × h
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let gravityMass = 1;
+        let currentPlanet = 'bumi';
+        let currentHeight = 50;
+        let isDropping = false;
+
+        const planets = {
+            'bumi': { name: 'Bumi', gravity: 9.8, color: '#74b9ff' },
+            'bulan': { name: 'Bulan', gravity: 1.6, color: '#dfe6e9' },
+            'mars': { name: 'Mars', gravity: 3.7, color: '#e17055' },
+            'jupiter': { name: 'Jupiter', gravity: 24.8, color: '#fdcb6e' }
+        };
+
+        const objects = {
+            '1': { icon: '🏀', name: 'Bola' },
+            '2': { icon: '🪨', name: 'Batu' },
+            '5': { icon: '📦', name: 'Kotak' },
+            '10': { icon: '🛢️', name: 'Drum' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhysics();
+        });
+
+        function initDragDrop() {
+            const draggable = document.getElementById('draggable-object');
+            const dropZone = document.getElementById('drop-zone');
+            
+            draggable.addEventListener('dragstart', function(e) {
+                if (isDropping) {
+                    e.preventDefault();
+                    return;
+                }
+                e.dataTransfer.setData('text/plain', e.target.id);
+                this.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (isDropping) return;
+                
+                const id = e.dataTransfer.getData('text/plain');
+                const draggable = document.getElementById(id);
+                
+                if (draggable) {
+                    const rect = this.getBoundingClientRect();
+                    const y = e.clientY - rect.top - draggable.offsetHeight / 2;
+                    
+                    // Batasi pergerakan dalam drop zone (0-80% dari tinggi)
+                    const maxY = rect.height * 0.8;
+                    const newY = Math.min(maxY, Math.max(0, y));
+                    
+                    currentHeight = 100 - (newY / maxY) * 100;
+                    
+                    draggable.style.position = 'absolute';
+                    draggable.style.left = '50%';
+                    draggable.style.transform = 'translateX(-50%)';
+                    draggable.style.top = newY + 'px';
+                    
+                    draggable.classList.remove('dragging');
+                    this.classList.remove('drag-over');
+                    
+                    updatePhysics();
+                    
+                    showMessage(`📐 Benda diposisikan pada ketinggian ${Math.round(currentHeight)} meter`, 'info');
+                }
+            });
+        }
+
+        function ubahMassaBenda() {
+            const select = document.getElementById('mass-select');
+            gravityMass = parseInt(select.value);
+            document.getElementById('gravity-mass').textContent = gravityMass;
+            
+            const object = objects[gravityMass];
+            document.getElementById('object-icon').textContent = object.icon;
+            document.querySelector('.object-name').textContent = object.name;
+            document.querySelector('.object-mass').textContent = gravityMass + ' kg';
+            
+            updatePhysics();
+        }
+
+        function ubahPlanet() {
+            const select = document.getElementById('planet-select');
+            currentPlanet = select.value;
+            const planet = planets[currentPlanet];
+            
+            document.getElementById('planet-name').textContent = planet.name;
+            document.getElementById('gravity-value').textContent = planet.gravity;
+            
+            // Ubah warna background berdasarkan planet
+            document.querySelector('.gravity-setup').style.background = 
+                `linear-gradient(135deg, ${planet.color}, ${planet.color}dd)`;
+            
+            updatePhysics();
+            showMessage(`🌍 Planet diubah menjadi: ${planet.name}`, 'info');
+        }
+
+        function jatuhkanBenda() {
+            if (isDropping) return;
+            
+            isDropping = true;
+            const draggable = document.getElementById('draggable-object');
+            const dropZone = document.getElementById('drop-zone');
+            const rect = dropZone.getBoundingClientRect();
+            const groundY = rect.height * 0.8;
+            
+            const planet = planets[currentPlanet];
+            const fallTime = Math.sqrt(2 * currentHeight / planet.gravity).toFixed(2);
+            const impactSpeed = (planet.gravity * fallTime).toFixed(1);
+            
+            // Animasi jatuh
+            draggable.style.transition = `top ${fallTime}s cubic-bezier(0.4, 0, 0.6, 1)`;
+            draggable.style.top = groundY + 'px';
+            
+            showMessage(`⬇️ Benda jatuh!\n⏱️ Waktu: ${fallTime}s\n🚀 Kecepatan: ${impactSpeed} m/s`, 'info');
+            
+            setTimeout(() => {
+                // Tampilkan efek tumbukan
+                draggable.style.transform = 'translateX(-50%) scale(0.9)';
+                setTimeout(() => {
+                    draggable.style.transform = 'translateX(-50%) scale(1)';
+                }, 100);
+                
+                showMessage('💥 Benda menyentuh tanah!', 'success');
+                isDropping = false;
+            }, fallTime * 1000);
+        }
+
+        function resetExperiment() {
+            if (isDropping) return;
+            
+            const draggable = document.getElementById('draggable-object');
+            
+            draggable.style.position = 'static';
+            draggable.style.top = '';
+            draggable.style.transform = '';
+            draggable.style.transition = '';
+            
+            currentHeight = 50;
+            updatePhysics();
+            
+            showMessage('🔄 Posisi benda direset!', 'info');
+        }
+
+        function updatePhysics() {
+            const planet = planets[currentPlanet];
+            const potentialEnergy = Math.round(gravityMass * planet.gravity * currentHeight);
+            
+            document.getElementById('current-height').textContent = Math.round(currentHeight);
+            document.getElementById('potential-energy').textContent = potentialEnergy;
+            document.getElementById('gravity-value').textContent = planet.gravity;
+        }
+
+        function tampilkanPenjelasan() {
+            const planet = planets[currentPlanet];
+            const potentialEnergy = Math.round(gravityMass * planet.gravity * currentHeight);
+            const fallTime = Math.sqrt(2 * currentHeight / planet.gravity).toFixed(2);
+            const impactSpeed = (planet.gravity * fallTime).toFixed(1);
+            
+            const penjelasan = `
+📚 <strong>Penjelasan Gaya Gravitasi:</strong>
+
+🌍 <strong>Gaya Gravitasi</strong> adalah gaya tarik-menarik antara dua benda yang memiliki massa.
+
+📊 <strong>Data Eksperimen:</strong>
+• Massa benda: ${gravityMass} kg
+• Ketinggian: ${Math.round(currentHeight)} meter
+• Gravitasi ${planet.name}: ${planet.gravity} m/s²
+• Energi potensial: ${potentialEnergy} Joule
+• Waktu jatuh: ${fallTime} detik
+• Kecepatan tumbukan: ${impactSpeed} m/s
+
+🔬 <strong>Konsep Fisika:</strong>
+• <strong>Energi Potensial:</strong> EP = m × g × h
+• <strong>Waktu Jatuh Bebas:</strong> t = √(2h/g)
+• <strong>Kecepatan Akhir:</strong> v = g × t
+• Semakin besar gravitasi, semakin cepat benda jatuh
+
+🚀 <strong>Fakta Menarik:</strong>
+• Di Bulan, Anda bisa melompat 6x lebih tinggi
+• Gravitasi Jupiter 2.5x lebih kuat dari Bumi
+• Astronot melayang karena microgravity
+            `;
+            
+            showMessage(penjelasan, 'info');
+        }
+
+        function showMessage(message, type) {
+            const oldMessage = document.querySelector('.message');
+            if (oldMessage) oldMessage.remove();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message;
+            
+            document.querySelector('.experiment-area').prepend(messageDiv);
+            
+            const delay = type === 'info' ? 8000 : 5000;
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, delay);
+        }
+    </script>
+
+    <style>
+        .gravity-setup {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 3px solid #0984e3;
+        }
+
+        .height-indicator {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .height-mark {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.9em;
+            border: 1px solid #74b9ff;
+        }
+
+        .drop-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            cursor: pointer;
+        }
+
+        .draggable-object {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 20px;
+            border-radius: 12px;
+            cursor: grab;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            border: 3px solid #fdcb6e;
+            min-width: 100px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .object-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .object-mass {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .object-name {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(135deg, #a55c1b, #8b4513);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 3px solid #8b4513;
+        }
+
+        .ground-label {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .draggable-object.dragging {
+            opacity: 0.8;
+            transform: translateX(-50%) scale(1.1);
+            cursor: grabbing;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .gravity-setup {
+                height: 300px;
+            }
+            
+            .height-mark {
+                font-size: 0.8em;
+                padding: 3px 8px;
+            }
+            
+            .draggable-object {
+                padding: 15px;
+                min-width: 80px;
+            }
+            
+            .object-icon {
+                font-size: 2em;
+            }
+        }
+    </style>
+</body>
+</html>

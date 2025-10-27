@@ -1,0 +1,349 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-image: url('backgroundindex.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Background animasi dinonaktifkan */
+.background {
+    display: none;
+}
+
+.science-elements {
+    display: none;
+}
+
+.profile-header {
+    background: rgba(255, 255, 255, 0.6); /* dari 0.8 jadi 0.6 (lebih transparan) */
+    padding: 15px 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.back-btn {
+    background: #74b9ff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    background: #0984e3;
+}
+
+.title h1 {
+    color: #2d3436;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.title p {
+    color: #636e72;
+    text-align: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-photo {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid white;
+}
+
+.user-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.profile-card {
+    background: rgba(255, 255, 255, 0.6); /* dari 0.8 jadi 0.6 (lebih transparan) */
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-header-card {
+    background: linear-gradient(135deg, rgba(116, 185, 255, 0.9), rgba(9, 132, 227, 0.9));
+    padding: 40px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    backdrop-filter: blur(8px);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info h1 {
+    font-size: 2.2em;
+    margin-bottom: 5px;
+}
+
+.subject {
+    font-size: 1.3em;
+    opacity: 0.9;
+    margin-bottom: 15px;
+}
+
+.school-info {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.school, .experience {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.profile-details {
+    padding: 40px;
+}
+
+.detail-section {
+    margin-bottom: 40px;
+}
+
+.detail-section h2 {
+    color: #2d3436;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dfe6e9;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 15px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(248, 249, 250, 0.6);
+    border-radius: 10px;
+    border-left: 4px solid #74b9ff;
+    min-height: 60px;
+}
+
+.label {
+    font-weight: bold;
+    color: #636e72;
+    min-width: 150px;
+    flex-shrink: 0;
+}
+
+.value {
+    color: #2d3436;
+    font-weight: 500;
+    flex: 1;
+}
+
+.education-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.education-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(248, 249, 250, 0.6);
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.education-item:hover {
+    transform: translateX(10px);
+}
+
+.edu-icon {
+    font-size: 2em;
+    flex-shrink: 0;
+}
+
+.edu-info h3 {
+    color: #2d3436;
+    margin-bottom: 5px;
+}
+
+.edu-info p {
+    color: #636e72;
+    margin-bottom: 5px;
+}
+
+.edu-info small {
+    color: #74b9ff;
+    font-weight: 500;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(248, 249, 250, 0.6);
+    border-radius: 10px;
+    border-left: 4px solid #74b9ff;
+    min-height: 70px;
+}
+
+.contact-icon {
+    font-size: 1.5em;
+    flex-shrink: 0;
+}
+
+.contact-info strong {
+    display: block;
+    color: #2d3436;
+    margin-bottom: 5px;
+}
+
+.contact-info p {
+    color: #636e72;
+    margin: 0;
+}
+
+.profile-footer {
+    background: rgba(255, 255, 255, 0.6); /* dari 0.75 jadi 0.6 (lebih transparan) */
+    padding: 20px;
+    text-align: center;
+    margin-top: 40px;
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-footer p {
+    color: #636e72;
+}
+
+@media (max-width: 768px) {
+    .profile-header-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-info h1 {
+        font-size: 1.8em;
+    }
+    
+    .school-info {
+        justify-content: center;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .label {
+        min-width: auto;
+        font-size: 0.9em;
+    }
+    
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .education-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-details {
+        padding: 20px;
+    }
+    
+    .detail-section h2 {
+        font-size: 1.3em;
+    }
+}

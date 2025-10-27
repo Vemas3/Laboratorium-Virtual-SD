@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Lab Sains SD</title>
+    <title>Laboratorium Virtual SD</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Background element lama dinonaktifkan via CSS -->
     <div class="background">
         <div class="science-elements">
             <div class="molecule"></div>
@@ -18,13 +19,15 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo">
-                <h1>🔬 Virtual Lab Sains</h1>
+                <h1>🔬 Laboratorium Virtual SD</h1>
                 <p>Belajar Jenis-Jenis Gaya untuk SD</p>
             </div>
             <div class="identity">
                 <div class="photo-placeholder">
-                    <div class="photo" onclick="bukaProfileGuru()">👨‍🏫</div>
-                    <span class="photo-label">Guru Sains</span>
+                    <div class="photo" onclick="bukaProfileGuru()">
+                        <img src="fotofriss.jpg" alt="Foto Guru">
+                    </div>
+                    <span class="photo-label">Profil</span>
                 </div>
             </div>
         </div>
@@ -33,7 +36,7 @@
     <main class="main-menu">
         <div class="menu-container">
             <div class="welcome-message">
-                <h2>Selamat Datang di Lab Virtual!</h2>
+                <h2>Selamat Datang di Laboratorium Virtual SD!</h2>
                 <p>Pilih mode belajar tentang jenis-jenis gaya</p>
             </div>
 
@@ -75,10 +78,13 @@
     </main>
 
     <footer class="main-footer">
-        <p>© 2024 Virtual Lab Sains SD - Jenis-Jenis Gaya</p>
+        <p>© 2025 Laboratorium Virtual SD - Jenis-Jenis Gaya</p>
     </footer>
 
-    <script src="script.js"></script>
-    <script src="refresh.js"></script>
+    <script>
+        function bukaProfileGuru() {
+            window.location.href = 'profile.html';
+        }
+    </script>
 </body>
 </html>

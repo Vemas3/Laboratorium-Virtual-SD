@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya Pegas - Virtual Lab Sains SD</title>
+    <link rel="stylesheet" href="style-simulasi-drag.css">
+</head>
+<body>
+    <div class="background">
+        <div class="lab-elements">
+            <div class="flask"></div>
+            <div class="flask"></div>
+        </div>
+    </div>
+
+    <header class="simulasi-header">
+        <div class="header-content">
+            <a href="simulasi.html" class="back-btn">⬅️ Kembali ke Pilihan</a>
+            <div class="title">
+                <h1>💨 SIMULASI GAYA PEGAS</h1>
+                <p>Eksperimen Drag & Drop - Regangkan dan Lepaskan Pegas</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-container">
+        <div class="experiment-area">
+            <div class="control-panel">
+                <h3>🎮 Kontrol Eksperimen</h3>
+                <div class="control-group">
+                    <label>Konstanta Pegas: <span id="spring-constant">100</span> N/m</label>
+                    <input type="range" id="spring-slider" min="50" max="200" value="100" onchange="ubahKonstantaPegas()">
+                </div>
+                <div class="control-group">
+                    <label>Massa Beban: <span id="weight-mass">1</span> kg</label>
+                    <select id="mass-select" onchange="ubahMassaBeban()">
+                        <option value="1">1 kg (Ringan)</option>
+                        <option value="2">2 kg (Sedang)</option>
+                        <option value="5">5 kg (Berat)</option>
+                        <option value="10">10 kg (Sangat Berat)</option>
+                    </select>
+                </div>
+                <div class="data-display">
+                    <div class="data-item">Regangan: <span id="stretch-length">0</span> cm</div>
+                    <div class="data-item">Gaya Pegas: <span id="spring-force">0</span> N</div>
+                    <div class="data-item">Energi Potensial: <span id="spring-energy">0</span> J</div>
+                </div>
+            </div>
+
+            <div class="drag-experiment-area">
+                <div class="spring-setup">
+                    <div class="spring-base">
+                        <div class="base-label">🏗️ Titik Tetap</div>
+                    </div>
+                    <div class="spring-body" id="spring-body">
+                        <div class="spring-coil" id="spring-coil">〰️〰️〰️</div>
+                    </div>
+                    <div class="draggable-weight" id="draggable-weight" draggable="true">
+                        <div class="weight-icon">⚖️</div>
+                        <div class="weight-info">
+                            <div class="weight-mass">1 kg</div>
+                            <div class="weight-label">Beban</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scale-indicator">
+                    <div class="scale-mark">0 cm</div>
+                    <div class="scale-mark">10 cm</div>
+                    <div class="scale-mark">20 cm</div>
+                    <div class="scale-mark">30 cm</div>
+                    <div class="scale-mark">40 cm</div>
+                    <div class="scale-mark">50 cm</div>
+                </div>
+            </div>
+
+            <div class="experiment-controls">
+                <button onclick="resetExperiment()">🔄 Reset Pegas</button>
+                <button onclick="lepasPegas()">🎯 Lepaskan Pegas</button>
+                <button onclick="tampilkanPenjelasan()">💡 Penjelasan</button>
+            </div>
+
+            <div class="experiment-info">
+                <h4>💡 Petunjuk Eksperimen</h4>
+                <p><strong>Drag & drop</strong> beban ke bawah untuk meregangkan pegas. Amati bagaimana <strong>gaya pegas</strong> bekerja dan energi potensial yang tersimpan!</p>
+                <div class="physics-info">
+                    <strong>Hukum Hooke:</strong> F = k × x (Gaya = Konstanta × Regangan)
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let springConstant = 100;
+        let weightMass = 1;
+        let isStretched = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhysics();
+        });
+
+        function initDragDrop() {
+            const draggable = document.getElementById('draggable-weight');
+            const springSetup = document.querySelector('.spring-setup');
+            
+            draggable.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                this.classList.add('dragging');
+            });
+
+            draggable.addEventListener('drag', function(e) {
+                if (e.clientY > 0) {
+                    const springSetupRect = springSetup.getBoundingClientRect();
+                    const maxStretch = 200; // maksimal regangan 50cm
+                    const currentY = e.clientY - springSetupRect.top;
+                    const stretch = Math.min(maxStretch, Math.max(0, currentY - 100));
+                    
+                    updatePegas(stretch);
+                }
+            });
+
+            draggable.addEventListener('dragend', function(e) {
+                this.classList.remove('dragging');
+                springSetup.classList.remove('drag-over');
+                
+                if (isStretched) {
+                    showMessage('💨 Pegas teregang! Energi potensial tersimpan.', 'success');
+                }
+            });
+            
+            springSetup.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            springSetup.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            springSetup.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                const draggable = document.getElementById(id);
+                
+                if (draggable) {
+                    const rect = this.getBoundingClientRect();
+                    const y = e.clientY - rect.top - draggable.offsetHeight / 2;
+                    const stretch = Math.max(0, y - 80);
+                    
+                    updatePegas(stretch);
+                    
+                    draggable.style.position = 'absolute';
+                    draggable.style.left = '50%';
+                    draggable.style.transform = 'translateX(-50%)';
+                    draggable.style.top = (80 + stretch) + 'px';
+                    
+                    draggable.classList.remove('dragging');
+                    this.classList.remove('drag-over');
+                }
+            });
+        }
+
+        function ubahKonstantaPegas() {
+            const slider = document.getElementById('spring-slider');
+            springConstant = parseInt(slider.value);
+            document.getElementById('spring-constant').textContent = springConstant;
+            
+            updatePhysics();
+        }
+
+        function ubahMassaBeban() {
+            const select = document.getElementById('mass-select');
+            weightMass = parseInt(select.value);
+            document.getElementById('weight-mass').textContent = weightMass;
+            
+            const weightDisplay = document.querySelector('.weight-mass');
+            weightDisplay.textContent = weightMass + ' kg';
+            
+            updatePhysics();
+        }
+
+        function updatePegas(stretch) {
+            const stretchCm = (stretch / 4).toFixed(1);
+            const force = (springConstant * (stretch / 100)).toFixed(1);
+            const energy = (0.5 * springConstant * Math.pow(stretch / 100, 2)).toFixed(2);
+            
+            document.getElementById('stretch-length').textContent = stretchCm;
+            document.getElementById('spring-force').textContent = force;
+            document.getElementById('spring-energy').textContent = energy;
+            
+            // Animasi pegas
+            const springBody = document.getElementById('spring-body');
+            const springCoil = document.getElementById('spring-coil');
+            springBody.style.height = (100 + stretch) + 'px';
+            springCoil.style.transform = `scaleY(${1 + stretch/50})`;
+            
+            isStretched = stretch > 10;
+        }
+
+        function lepasPegas() {
+            if (!isStretched) {
+                showMessage('❌ Tarik pegas terlebih dahulu sebelum melepaskan!', 'error');
+                return;
+            }
+            
+            const draggable = document.getElementById('draggable-weight');
+            const springBody = document.getElementById('spring-body');
+            const springCoil = document.getElementById('spring-coil');
+            
+            // Animasi pegas kembali
+            draggable.style.transition = 'top 0.5s ease-out';
+            springBody.style.transition = 'height 0.5s ease-out';
+            springCoil.style.transition = 'transform 0.5s ease-out';
+            
+            draggable.style.top = '80px';
+            springBody.style.height = '100px';
+            springCoil.style.transform = 'scaleY(1)';
+            
+            // Reset data
+            setTimeout(() => {
+                document.getElementById('stretch-length').textContent = '0';
+                document.getElementById('spring-force').textContent = '0';
+                document.getElementById('spring-energy').textContent = '0';
+                
+                draggable.style.transition = '';
+                springBody.style.transition = '';
+                springCoil.style.transition = '';
+                
+                isStretched = false;
+            }, 500);
+            
+            showMessage('🚀 Pegas dilepas! Energi potensial berubah menjadi energi kinetik.', 'info');
+        }
+
+        function resetExperiment() {
+            const draggable = document.getElementById('draggable-weight');
+            const springBody = document.getElementById('spring-body');
+            const springCoil = document.getElementById('spring-coil');
+            
+            draggable.style.position = 'static';
+            draggable.style.top = '';
+            draggable.style.transform = '';
+            springBody.style.height = '100px';
+            springCoil.style.transform = 'scaleY(1)';
+            
+            document.getElementById('stretch-length').textContent = '0';
+            document.getElementById('spring-force').textContent = '0';
+            document.getElementById('spring-energy').textContent = '0';
+            
+            isStretched = false;
+            
+            showMessage('🔄 Pegas direset ke posisi normal!', 'info');
+        }
+
+        function updatePhysics() {
+            // Update physics constants
+        }
+
+        function tampilkanPenjelasan() {
+            const penjelasan = `
+📚 <strong>Penjelasan Gaya Pegas:</strong>
+
+💨 <strong>Gaya Pegas</strong> adalah gaya yang dihasilkan pegas ketika diregangkan atau ditekan.
+
+📊 <strong>Data Eksperimen:</strong>
+• Konstanta pegas: ${springConstant} N/m
+• Massa beban: ${weightMass} kg
+• Regangan maksimal: 50 cm
+
+🔬 <strong>Konsep Fisika:</strong>
+• <strong>Hukum Hooke:</strong> F = k × x
+• <strong>Energi Potensial Pegas:</strong> E = ½ × k × x²
+• <strong>Elastisitas:</strong> Kemampuan pegas kembali ke bentuk semula
+• Semakin besar konstanta pegas, semakin kaku pegas
+
+🏠 <strong>Contoh dalam kehidupan:</strong>
+• Spring bed
+• Pegas di kursi
+• Suspensi mobil
+• Ballpoint
+• Trampolin
+            `;
+            
+            showMessage(penjelasan, 'info');
+        }
+
+        function showMessage(message, type) {
+            const oldMessage = document.querySelector('.message');
+            if (oldMessage) oldMessage.remove();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = message;
+            
+            document.querySelector('.experiment-area').prepend(messageDiv);
+            
+            const delay = type === 'info' ? 8000 : 5000;
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, delay);
+        }
+    </script>
+
+    <style>
+        .spring-setup {
+            position: relative;
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #b2bec3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .spring-base {
+            width: 100px;
+            height: 20px;
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .base-label {
+            font-size: 0.8em;
+        }
+
+        .spring-body {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: height 0.3s ease;
+        }
+
+        .spring-coil {
+            font-size: 2em;
+            transition: transform 0.3s ease;
+            color: #74b9ff;
+        }
+
+        .draggable-weight {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: grab;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid #0984e3;
+            min-width: 100px;
+        }
+
+        .weight-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .weight-mass {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .weight-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .scale-indicator {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+            padding: 0 20px;
+        }
+
+        .scale-mark {
+            font-size: 0.8em;
+            color: #636e72;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .draggable-weight.dragging {
+            opacity: 0.8;
+            transform: scale(1.1);
+            cursor: grabbing;
+        }
+
+        @media (max-width: 768px) {
+            .spring-setup {
+                height: 250px;
+            }
+            
+            .scale-indicator {
+                padding: 0 10px;
+            }
+            
+            .scale-mark {
+                font-size: 0.7em;
+            }
+        }
+    </style>
+</body>
+</html>

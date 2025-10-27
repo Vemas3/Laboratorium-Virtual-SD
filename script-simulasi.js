@@ -1,447 +1,243 @@
-// script-simulasi.js
-
-// State variables untuk setiap eksperimen
-let state = {
-    otot: {
-        position: 0,
-        force: 0,
-        isLifted: false
-    },
-    gesek: {
-        surface: 'kayu',
-        distance: 0,
-        frictionCoefficient: 0.3
-    },
-    magnet: {
-        position: 'center',
-        attractedObjects: []
-    },
-    pegas: {
-        stretch: 0,
-        isStretched: false,
-        status: 'normal'
-    },
-    gravitasi: {
-        isFalling: false,
-        fallTime: 0,
-        speed: 0
-    }
-};
-
-// Fungsi navigasi utama
-function bukaAlat(jenisGaya) {
-    // Sembunyikan default screen dan semua screen
-    document.querySelector('.default-screen').style.display = 'none';
-    const screens = document.querySelectorAll('.simulation-screen');
-    screens.forEach(screen => {
-        screen.classList.remove('active');
-    });
+// SIMULASI GAYA OTOT
+function ubahMassa() {
+    const massSlider = document.getElementById('mass-slider');
+    const massValue = document.getElementById('mass-value');
+    const objectMass = document.getElementById('object-mass');
     
-    // Tampilkan screen yang dipilih
-    const targetScreen = document.getElementById(`${jenisGaya}-screen`);
-    if (targetScreen) {
-        targetScreen.classList.add('active');
-    }
-    
-    // Reset state ketika membuka eksperimen baru
-    resetAllExperiments();
+    massValue.textContent = massSlider.value;
+    objectMass.textContent = massSlider.value + ' kg';
 }
 
-function tutupAlat() {
-    // Kembali ke menu utama
-    const screens = document.querySelectorAll('.simulation-screen');
-    screens.forEach(screen => {
-        screen.classList.remove('active');
-    });
+function ubahGaya() {
+    const forceSlider = document.getElementById('force-slider');
+    const forceDisplay = document.getElementById('force-display');
+    const forceArrow = document.getElementById('force-arrow');
     
-    // Tampilkan default screen
-    document.querySelector('.default-screen').style.display = 'block';
+    forceDisplay.textContent = forceSlider.value;
+    forceArrow.style.width = (forceSlider.value / 2) + 'px';
+    forceArrow.style.display = forceSlider.value > 0 ? 'block' : 'none';
 }
 
-// ==================== EKSPERIMEN GAYA OTOT ====================
-function dorongObject() {
-    const object = document.getElementById('movable-object');
-    const forceValue = document.getElementById('force-value');
-    
-    state.otot.position += 50;
-    state.otot.force = 20;
-    
-    object.style.transform = `translateX(${state.otot.position}px)`;
-    forceValue.textContent = state.otot.force;
-    
-    // Animasi dorong
-    object.style.transition = 'transform 0.3s ease';
-    
-    // Reset force setelah 1 detik
-    setTimeout(() => {
-        state.otot.force = 0;
-        forceValue.textContent = state.otot.force;
-    }, 1000);
+function dorongKanan() {
+    document.getElementById('force-slider').value = 50;
+    ubahGaya();
+    document.getElementById('velocity').textContent = '2.5';
+    document.getElementById('acceleration').textContent = '5.0';
+    document.getElementById('position').textContent = '+5.0';
 }
 
-function tarikObject() {
-    const object = document.getElementById('movable-object');
-    const forceValue = document.getElementById('force-value');
-    
-    state.otot.position -= 50;
-    state.otot.force = 15;
-    
-    object.style.transform = `translateX(${state.otot.position}px)`;
-    forceValue.textContent = state.otot.force;
-    
-    // Animasi tarik
-    object.style.transition = 'transform 0.3s ease';
-    
-    setTimeout(() => {
-        state.otot.force = 0;
-        forceValue.textContent = state.otot.force;
-    }, 1000);
-}
-
-function angkatObject() {
-    const object = document.getElementById('movable-object');
-    const forceValue = document.getElementById('force-value');
-    
-    if (!state.otot.isLifted) {
-        state.otot.force = 30;
-        object.style.transform = `translate(${state.otot.position}px, -80px)`;
-        state.otot.isLifted = true;
-    } else {
-        state.otot.force = 0;
-        object.style.transform = `translate(${state.otot.position}px, 0)`;
-        state.otot.isLifted = false;
-    }
-    
-    forceValue.textContent = state.otot.force;
-    object.style.transition = 'transform 0.5s ease';
+function dorongKiri() {
+    document.getElementById('force-slider').value = 50;
+    ubahGaya();
+    document.getElementById('velocity').textContent = '-2.5';
+    document.getElementById('acceleration').textContent = '-5.0';
+    document.getElementById('position').textContent = '-5.0';
 }
 
 function resetOtot() {
-    const object = document.getElementById('movable-object');
-    const forceValue = document.getElementById('force-value');
-    
-    state.otot.position = 0;
-    state.otot.force = 0;
-    state.otot.isLifted = false;
-    
-    object.style.transform = 'translate(0, 0)';
-    forceValue.textContent = state.otot.force;
-    object.style.transition = 'transform 0.5s ease';
+    document.getElementById('mass-slider').value = 10;
+    document.getElementById('force-slider').value = 0;
+    ubahMassa();
+    ubahGaya();
+    document.getElementById('velocity').textContent = '0';
+    document.getElementById('acceleration').textContent = '0';
+    document.getElementById('position').textContent = '0';
 }
 
-// ==================== EKSPERIMEN GAYA GESEK ====================
+// SIMULASI GAYA GESEK
+let currentSurface = 'kayu';
+
 function gantiPermukaan(permukaan) {
-    const surface = document.getElementById('current-surface');
-    const surfaceButtons = document.querySelectorAll('.surface-btn');
-    const frictionLevel = document.getElementById('friction-level');
+    currentSurface = permukaan;
+    document.getElementById('surface-label').textContent = 'Permukaan ' + 
+        (permukaan === 'kayu' ? 'Kayu' : 
+         permukaan === 'es' ? 'Es' : 
+         permukaan === 'karpet' ? 'Karpet' : 'Karet');
     
-    // Update active button
-    surfaceButtons.forEach(btn => {
+    // Update button active state
+    document.querySelectorAll('.surface-btn').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.textContent.toLowerCase().includes(permukaan)) {
-            btn.classList.add('active');
-        }
     });
-    
-    // Update surface appearance dan koefisien gesek
-    switch(permukaan) {
-        case 'kayu':
-            surface.style.background = '#a55eea';
-            state.gesek.frictionCoefficient = 0.4;
-            frictionLevel.textContent = 'Tingkat Gesekan: Sedang';
-            break;
-        case 'es':
-            surface.style.background = '#74b9ff';
-            state.gesek.frictionCoefficient = 0.1;
-            frictionLevel.textContent = 'Tingkat Gesekan: Rendah';
-            break;
-        case 'karpet':
-            surface.style.background = '#e17055';
-            state.gesek.frictionCoefficient = 0.6;
-            frictionLevel.textContent = 'Tingkat Gesekan: Tinggi';
-            break;
-    }
-    
-    state.gesek.surface = permukaan;
-    resetGesek();
+    event.target.classList.add('active');
 }
 
-function dorongDenganGaya(gaya) {
-    const object = document.getElementById('sliding-object');
-    const distanceElement = document.getElementById('distance-traveled');
+function ubahGayaDorong() {
+    const pushSlider = document.getElementById('push-slider');
+    const pushForce = document.getElementById('push-force');
+    pushForce.textContent = pushSlider.value;
+}
+
+function jalankanEksperimenGesek() {
+    const frictionValues = {
+        'kayu': 20,
+        'es': 5,
+        'karpet': 40,
+        'karet': 60
+    };
     
-    if (object.style.transform === 'translateX(0px)') {
-        // Hitung jarak berdasarkan gaya dan koefisien gesek
-        const effectiveForce = gaya - (state.gesek.frictionCoefficient * 100);
-        const distance = Math.max(0, effectiveForce * 2);
-        
-        state.gesek.distance = distance;
-        
-        // Animasikan pergerakan
-        object.style.transform = `translateX(${distance}px)`;
-        object.style.transition = `transform ${1.5 - (gaya/100)}s ease-out`;
-        
-        distanceElement.textContent = `Jarak: ${Math.round(distance)} cm`;
-        
-        // Berikan feedback visual
-        if (gaya === 100) {
-            object.style.fontSize = '2.5em';
-            setTimeout(() => {
-                object.style.fontSize = '2em';
-            }, 300);
-        }
+    const frictionForce = frictionValues[currentSurface];
+    const pushForce = parseInt(document.getElementById('push-slider').value);
+    const netForce = pushForce - frictionForce;
+    
+    document.getElementById('friction-force').textContent = frictionForce;
+    document.getElementById('net-force').textContent = netForce > 0 ? netForce : 0;
+    
+    if (netForce > 0) {
+        document.getElementById('sliding-object').style.transform = 'translateX(100px)';
+    } else {
+        document.getElementById('sliding-object').style.transform = 'translateX(0)';
     }
 }
 
 function resetGesek() {
-    const object = document.getElementById('sliding-object');
-    const distanceElement = document.getElementById('distance-traveled');
-    
-    state.gesek.distance = 0;
-    object.style.transform = 'translateX(0)';
-    object.style.transition = 'transform 0.5s ease';
-    distanceElement.textContent = 'Jarak: 0 cm';
-    object.style.fontSize = '2em';
+    document.getElementById('push-slider').value = 50;
+    ubahGayaDorong();
+    document.getElementById('friction-force').textContent = '0';
+    document.getElementById('net-force').textContent = '0';
+    document.getElementById('sliding-object').style.transform = 'translateX(0)';
 }
 
-// ==================== EKSPERIMEN GAYA MAGNET ====================
+// SIMULASI GAYA MAGNET
+function ubahKekuatanMagnet() {
+    const magnetSlider = document.getElementById('magnet-slider');
+    const magnetPower = document.getElementById('magnet-power');
+    magnetPower.textContent = magnetSlider.value;
+}
+
+function ubahKutub(kutub) {
+    document.getElementById('magnet-pole').textContent = kutub === 'utara' ? 'N' : 'S';
+    document.querySelectorAll('.pole-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
 function gerakkanMagnet() {
     const magnet = document.getElementById('magnet');
-    const objects = document.querySelectorAll('.magnet-setup .object');
-    const magnetInfo = document.getElementById('magnet-info');
+    const currentLeft = parseInt(magnet.style.left || '0');
+    magnet.style.left = (currentLeft + 50) % 200 + 'px';
     
-    // Toggle posisi magnet
-    if (state.magnet.position === 'center') {
-        magnet.style.transform = 'translate(-150%, -50%)';
-        state.magnet.position = 'left';
-    } else {
-        magnet.style.transform = 'translate(-50%, -50%)';
-        state.magnet.position = 'center';
-    }
+    // Update jarak
+    const distance = 50 - (currentLeft / 4);
+    document.getElementById('magnet-distance').textContent = Math.max(10, Math.round(distance));
     
-    // Cek benda yang tertarik
-    state.magnet.attractedObjects = [];
-    objects.forEach(object => {
-        const objectType = object.getAttribute('data-type');
-        
-        if (objectType === 'ferro' && state.magnet.position === 'left') {
-            // Benda ferro tertarik
-            object.classList.add('attracted');
-            state.magnet.attractedObjects.push(object.textContent);
-        } else {
-            object.classList.remove('attracted');
-        }
-    });
-    
-    // Update info
-    if (state.magnet.attractedObjects.length > 0) {
-        magnetInfo.textContent = `Magnet menarik: ${state.magnet.attractedObjects.join(', ')}`;
-        magnetInfo.style.background = '#d4edda';
-        magnetInfo.style.color = '#155724';
-    } else {
-        magnetInfo.textContent = 'Tidak ada benda yang tertarik magnet';
-        magnetInfo.style.background = '#f8d7da';
-        magnetInfo.style.color = '#721c24';
-    }
+    // Update gaya magnet
+    const power = parseInt(document.getElementById('magnet-slider').value);
+    document.getElementById('magnetic-force').textContent = Math.round(power * distance / 50);
 }
 
 function resetMagnet() {
-    const magnet = document.getElementById('magnet');
-    const objects = document.querySelectorAll('.magnet-setup .object');
-    const magnetInfo = document.getElementById('magnet-info');
-    
-    state.magnet.position = 'center';
-    state.magnet.attractedObjects = [];
-    
-    magnet.style.transform = 'translate(-50%, -50%)';
-    magnet.style.transition = 'transform 0.5s ease';
-    
-    objects.forEach(object => {
-        object.classList.remove('attracted');
-        object.style.transition = 'transform 0.5s ease';
-    });
-    
-    magnetInfo.textContent = 'Klik magnet untuk menggerakkan dan melihat benda yang tertarik';
-    magnetInfo.style.background = '#dfe6e9';
-    magnetInfo.style.color = '#333';
+    document.getElementById('magnet').style.left = '0px';
+    document.getElementById('magnet-distance').textContent = '50';
+    document.getElementById('magnetic-force').textContent = '0';
 }
 
-// ==================== EKSPERIMEN GAYA PEGAS ====================
+// SIMULASI GAYA PEGAS
+function ubahKekuatanTarik() {
+    const pullSlider = document.getElementById('pull-slider');
+    const pullStrength = document.getElementById('pull-strength');
+    pullStrength.textContent = pullSlider.value;
+}
+
 function tarikPegas() {
-    const spring = document.getElementById('spring');
-    const weight = document.getElementById('weight');
-    const springStatus = document.getElementById('spring-status');
-    const stretchLength = document.getElementById('stretch-length');
-    
-    if (!state.pegas.isStretched) {
-        state.pegas.stretch += 30;
-        state.pegas.isStretched = true;
-        
-        spring.style.transform = 'translate(-50%, -50%) scaleY(1.5)';
-        weight.style.transform = 'translateX(-50%) translateY(20px)';
-        spring.style.transition = 'transform 0.5s ease';
-        weight.style.transition = 'transform 0.5s ease';
-        
-        springStatus.textContent = 'Pegas: Tertarik';
-        stretchLength.textContent = `Regangan: ${state.pegas.stretch} cm`;
-        
-        // Ubah tampilan pegas saat tertarik
-        spring.style.background = 'linear-gradient(135deg, #ff7675, #fd79a8)';
-        spring.style.padding = '5px';
-        spring.style.borderRadius = '10px';
-        spring.textContent = '🔄🔄🔄';
-    }
+    const strength = parseInt(document.getElementById('pull-slider').value);
+    document.getElementById('spring').style.transform = 'scaleY(1.' + strength + ')';
+    document.getElementById('weight').style.marginTop = (strength * 2) + 'px';
+    document.getElementById('stretch-length').textContent = 'Regangan: ' + strength + ' cm';
+    document.getElementById('spring-force').textContent = 'Gaya Pegas: ' + (strength * 2) + ' N';
+    document.getElementById('spring-status').textContent = 'Pegas: Tertarik';
 }
 
 function lepasPegas() {
-    const spring = document.getElementById('spring');
-    const weight = document.getElementById('weight');
-    const springStatus = document.getElementById('spring-status');
-    
-    if (state.pegas.isStretched) {
-        // Animasi pegas kembali dengan efek bouncing
-        spring.style.transform = 'translate(-50%, -50%) scaleY(1)';
-        weight.style.transform = 'translateX(-50%) translateY(0)';
-        spring.style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-        weight.style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-        
-        springStatus.textContent = 'Pegas: Melompat!';
-        
-        // Reset setelah animasi
-        setTimeout(() => {
-            state.pegas.isStretched = false;
-            springStatus.textContent = 'Pegas: Normal';
-            spring.style.background = 'none';
-            spring.style.padding = '0';
-            spring.style.borderRadius = '0';
-            spring.textContent = '🔄';
-        }, 800);
-    }
+    document.getElementById('spring').style.transform = 'scaleY(1)';
+    document.getElementById('weight').style.marginTop = '0px';
+    document.getElementById('spring-status').textContent = 'Pegas: Normal';
 }
 
 function resetPegas() {
-    const spring = document.getElementById('spring');
-    const weight = document.getElementById('weight');
-    const springStatus = document.getElementById('spring-status');
-    const stretchLength = document.getElementById('stretch-length');
-    
-    state.pegas.stretch = 0;
-    state.pegas.isStretched = false;
-    
-    spring.style.transform = 'translate(-50%, -50%)';
-    weight.style.transform = 'translateX(-50%)';
-    spring.style.transition = 'transform 0.5s ease';
-    weight.style.transition = 'transform 0.5s ease';
-    
-    springStatus.textContent = 'Pegas: Normal';
-    stretchLength.textContent = 'Regangan: 0 cm';
-    spring.style.background = 'none';
-    spring.style.padding = '0';
-    spring.style.borderRadius = '0';
-    spring.textContent = '🔄';
+    document.getElementById('pull-slider').value = 50;
+    ubahKekuatanTarik();
+    lepasPegas();
+    document.getElementById('stretch-length').textContent = 'Regangan: 0 cm';
+    document.getElementById('spring-force').textContent = 'Gaya Pegas: 0 N';
 }
 
-// ==================== EKSPERIMEN GAYA GRAVITASI ====================
+// SIMULASI GAYA GRAVITASI
+function ubahMassaGravitasi() {
+    const massSlider = document.getElementById('gravity-mass-slider');
+    const massValue = document.getElementById('gravity-mass');
+    const objectMass = document.querySelector('#drop-object .object-mass');
+    
+    massValue.textContent = massSlider.value;
+    objectMass.textContent = massSlider.value + ' kg';
+}
+
+function ubahKetinggian() {
+    const heightSlider = document.getElementById('height-slider');
+    const heightValue = document.getElementById('height-value');
+    const heightDisplay = document.getElementById('height-display');
+    
+    heightValue.textContent = heightSlider.value;
+    heightDisplay.textContent = heightSlider.value + 'm';
+    document.getElementById('drop-object').style.top = '0px';
+}
+
+function ubahPlanet() {
+    const planetSelect = document.getElementById('planet-select');
+    const gravityValue = document.getElementById('gravity-value');
+    
+    const gravities = {
+        'bumi': '9.8 m/s²',
+        'bulan': '1.6 m/s²',
+        'mars': '3.7 m/s²'
+    };
+    
+    gravityValue.textContent = 'Gravitasi: ' + gravities[planetSelect.value];
+}
+
 function jatuhkanBenda() {
     const dropObject = document.getElementById('drop-object');
-    const fallSpeed = document.getElementById('fall-speed');
-    const fallTime = document.getElementById('fall-time');
+    const height = parseInt(document.getElementById('height-slider').value);
+    const planet = document.getElementById('planet-select').value;
     
-    if (!state.gravitasi.isFalling) {
-        state.gravitasi.isFalling = true;
-        state.gravitasi.fallTime = 0;
-        state.gravitasi.speed = 0;
-        
-        // Animasi jatuh
-        dropObject.style.transform = 'translateX(-50%) translateY(200px)';
-        dropObject.style.transition = 'transform 2s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
-        
-        // Simulasi percepatan gravitasi
-        let time = 0;
-        const gravityInterval = setInterval(() => {
-            time += 0.1;
-            state.gravitasi.fallTime = time.toFixed(1);
-            state.gravitasi.speed = (9.8 * time).toFixed(1);
-            
-            fallSpeed.textContent = `Kecepatan Jatuh: ${state.gravitasi.speed} m/s`;
-            fallTime.textContent = `Waktu Jatuh: ${state.gravitasi.fallTime} detik`;
-            
-            if (time >= 2) {
-                clearInterval(gravityInterval);
-                state.gravitasi.isFalling = false;
-            }
-        }, 100);
-    }
+    const gravities = {
+        'bumi': 9.8,
+        'bulan': 1.6,
+        'mars': 3.7
+    };
+    
+    const g = gravities[planet];
+    const time = Math.sqrt(2 * height / g).toFixed(1);
+    const speed = (g * time).toFixed(1);
+    
+    document.getElementById('fall-time').textContent = 'Waktu Jatuh: ' + time + ' detik';
+    document.getElementById('fall-speed').textContent = 'Kecepatan Jatuh: ' + speed + ' m/s';
+    
+    // Animasi jatuh
+    dropObject.style.transition = 'top ' + time + 's linear';
+    dropObject.style.top = (height * 3) + 'px';
 }
 
 function resetGravitasi() {
-    const dropObject = document.getElementById('drop-object');
-    const fallSpeed = document.getElementById('fall-speed');
-    const fallTime = document.getElementById('fall-time');
-    
-    state.gravitasi.isFalling = false;
-    state.gravitasi.fallTime = 0;
-    state.gravitasi.speed = 0;
-    
-    dropObject.style.transform = 'translateX(-50%) translateY(0)';
-    dropObject.style.transition = 'transform 0.5s ease';
-    
-    fallSpeed.textContent = 'Kecepatan Jatuh: 0 m/s';
-    fallTime.textContent = 'Waktu Jatuh: 0 detik';
+    document.getElementById('gravity-mass-slider').value = 1;
+    document.getElementById('height-slider').value = 50;
+    ubahMassaGravitasi();
+    ubahKetinggian();
+    document.getElementById('planet-select').value = 'bumi';
+    ubahPlanet();
+    document.getElementById('fall-time').textContent = 'Waktu Jatuh: 0 detik';
+    document.getElementById('fall-speed').textContent = 'Kecepatan Jatuh: 0 m/s';
+    document.getElementById('drop-object').style.top = '0px';
 }
 
-// ==================== FUNGSI UTILITAS ====================
-function resetAllExperiments() {
-    resetOtot();
-    resetGesek();
-    resetMagnet();
-    resetPegas();
-    resetGravitasi();
-}
-
-// Inisialisasi event listeners ketika DOM siap
+// Inisialisasi
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Virtual Lab Sains SD - Simulasi Gaya telah dimuat!');
-    
-    // Inisialisasi permukaan gesek default
-    gantiPermukaan('kayu');
-    
-    // Tambahkan event listener untuk keyboard (aksesibilitas)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            tutupAlat();
-        }
-        
-        // Shortcut angka 1-5 untuk buka alat
-        if (e.key >= '1' && e.key <= '5') {
-            const alatIds = ['otot', 'gesek', 'magnet', 'pegas', 'gravitasi'];
-            bukaAlat(alatIds[parseInt(e.key) - 1]);
-        }
-    });
-    
-    // Pastikan default screen ditampilkan saat pertama kali load
-    document.querySelector('.default-screen').style.display = 'block';
+    ubahMassa();
+    ubahGaya();
+    ubahGayaDorong();
+    ubahKekuatanMagnet();
+    ubahKekuatanTarik();
+    ubahMassaGravitasi();
+    ubahKetinggian();
+    ubahPlanet();
 });
-
-// Export functions untuk testing (jika diperlukan)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        bukaAlat,
-        tutupAlat,
-        dorongObject,
-        tarikObject,
-        angkatObject,
-        resetOtot,
-        gantiPermukaan,
-        dorongDenganGaya,
-        resetGesek,
-        gerakkanMagnet,
-        resetMagnet,
-        tarikPegas,
-        lepasPegas,
-        resetPegas,
-        jatuhkanBenda,
-        resetGravitasi,
-        state
-    };
-}
