@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratorium Virtual SD</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Redirect Script -->
+    <script>
+        // Cek jika user belum melihat cover page
+        if (!sessionStorage.getItem('coverShown')) {
+            // Redirect ke cover.html
+            window.location.href = 'cover.html';
+        }
+    </script>
+    <style>
+        /* Sembunyikan konten sementara untuk menghindari flash */
+        body {
+            visibility: hidden;
+        }
+        
+        /* Tampilkan setelah redirect check selesai */
+        body.loaded {
+            visibility: visible;
+        }
+    </style>
 </head>
 <body>
     <!-- Background element lama dinonaktifkan via CSS -->
@@ -82,6 +102,11 @@
     </footer>
 
     <script>
+        // Tampilkan body setelah semua script selesai
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+        });
+
         function bukaProfileGuru() {
             window.location.href = 'profile.html';
         }
